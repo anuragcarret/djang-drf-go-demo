@@ -1,0 +1,29 @@
+{
+    "debug": true,
+    "secret_key": "development-secret-key-that-is-at-least-32-chars-long",
+    "allowed_hosts": [
+        "localhost",
+        "127.0.0.1"
+    ],
+    "databases": {
+        "default": {
+            "engine": "postgres",
+            "name": "${DB_NAME:demo_db}",
+            "user": "${DB_USER:demo_user}",
+            "password": "${DB_PASSWORD:demo_password}",
+            "host": "${DB_HOST:localhost}",
+            "port": 5435
+        }
+    },
+    "installed_apps": [
+        "auth",
+        "accounts",
+        "posts",
+        "blog"
+    ],
+    "rest_framework": {
+        "pagination": {
+            "page_size": 10
+        }
+    }
+}

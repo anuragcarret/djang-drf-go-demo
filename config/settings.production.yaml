@@ -1,0 +1,6 @@
+debug: false
+allowed_hosts:
+  - "api.demo.com"
+rest_framework:
+  pagination:
+    page_size: 50
