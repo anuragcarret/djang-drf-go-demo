@@ -1,7 +1,10 @@
 package accounts
 
 import (
+	"net/http"
+
 	"github.com/anuragcarret/djang-drf-go/core/urls"
+	"github.com/anuragcarret/djang-drf-go/drf/authentication"
 	"github.com/anuragcarret/djang-drf-go/drf/views"
 	"github.com/anuragcarret/djang-drf-go/orm/db"
 )
@@ -10,12 +13,26 @@ import (
 func RegisterRoutes(database *db.DB) *urls.Router {
 	r := urls.NewRouter()
 
-	viewSet := NewAccountViewSet(database)
+	// Create authentication middleware
+	tokenStore := NewDemoTokenStore()
+	authMiddleware := authentication.AuthenticationMiddleware([]authentication.Authenticator{
+		authentication.NewTokenAuthentication(tokenStore),
+	})
 
-	// Register ModelHandler for the viewset
-	r.Post("/register/", views.ModelHandler(viewSet), "account-register")
-	r.Get("/", views.ModelHandler(viewSet), "account-list")
-	r.Get("/{id}", views.ModelHandler(viewSet), "account-detail")
+	// Public endpoints (no auth required)
+	accountViewSet := NewAccountViewSet(database)
+	r.Get("/", views.ModelHandler(accountViewSet), "account-list")
+	r.Post("/", views.ModelHandler(accountViewSet), "account-create")
+
+	// Authenticated endpoints
+	authViewSet := NewAuthenticatedAccountView(database)
+	r.Get("/me/", wrapWithAuth(authViewSet, authMiddleware), "account-me")
 
 	return r
+}
+
+// Helper to wrap view with authentication middleware
+func wrapWithAuth(view interface{}, authMiddleware func(http.Handler) http.Handler) http.Handler {
+	handler := views.ModelHandler(view.(views.APIViewSet))
+	return authMiddleware(handler)
 }
