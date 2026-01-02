@@ -60,6 +60,9 @@ func main() {
 	}
 	defer database.Close()
 
+	// 5. Configure Admin to use custom User Model
+	framework_admin.DefaultSite.SetUserModel(&accounts.Account{})
+
 	// 4. Register Commands
 	management.Commands.Register(cmd.NewMigrateCommand(database))
 	management.Commands.Register(cmd.NewMakemigrationsCommand(database))
