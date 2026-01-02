@@ -95,6 +95,6 @@ func (c *RunserverCommand) Run(ctx context.Context, args []string) error {
 	router.Include("/posts", posts.RegisterRoutes(c.DB), "posts")
 
 	fmt.Println("Starting modular demo server on :8080...")
-	handler := auth.AuthenticationMiddleware(router)
+	handler := auth.AuthenticationMiddleware(c.DB, &accounts.Account{})(router)
 	return http.ListenAndServe(":8080", handler)
 }
